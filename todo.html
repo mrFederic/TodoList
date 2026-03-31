@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-do list</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f9f8f6;
+      --surface:   #ffffff;
+      --surface2:  #f1f0ed;
+      --border:    rgba(0,0,0,0.10);
+      --border-md: rgba(0,0,0,0.18);
+      --text:      #1a1a18;
+      --muted:     #6b6a65;
+      --hint:      #a8a79f;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:        #1c1c1a;
+        --surface:   #252523;
+        --surface2:  #2e2e2b;
+        --border:    rgba(255,255,255,0.10);
+        --border-md: rgba(255,255,255,0.18);
+        --text:      #e8e6df;
+        --muted:     #9b9a93;
+        --hint:      #6b6a65;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+
+    .top {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 2rem;
+      max-width: 600px;
+    }
+
+    .top input {
+      flex: 1;
+      height: 38px;
+      padding: 0 14px;
+      border: 0.5px solid var(--border-md);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color .15s;
+    }
+
+    .top input:focus { border-color: #888; }
+    .top input::placeholder { color: var(--hint); }
+
+    .top button {
+      height: 38px;
+      padding: 0 18px;
+      border: 0.5px solid var(--border-md);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .12s;
+    }
+
+    .top button:hover { background: var(--surface2); }
+    .top button:active { transform: scale(0.98); }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .board { grid-template-columns: 1fr; }
+    }
+
+    .col {
+      background: var(--surface2);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      min-height: 320px;
+    }
+
+    .col-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .col-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    .badge-todo { background: #E6F1FB; color: #0C447C; }
+    .badge-prog { background: #FAEEDA; color: #633806; }
+    .badge-done { background: #EAF3DE; color: #27500A; }
+
+    @media (prefers-color-scheme: dark) {
+      .badge-todo { background: #0C447C; color: #B5D4F4; }
+      .badge-prog { background: #633806; color: #FAC775; }
+      .badge-done { background: #27500A; color: #C0DD97; }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      cursor: grab;
+      user-select: none;
+      transition: opacity .15s, border-color .1s;
+    }
+
+    .card:active { cursor: grabbing; opacity: .7; }
+    .card.drag-over { border-color: var(--border-md); }
+
+    .card-text {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.45;
+      margin-bottom: 8px;
+      word-break: break-word;
+    }
+
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .btn-sm {
+      font-size: 11px;
+      padding: 3px 9px;
+      border: 0.5px solid var(--border-md);
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background .1s, color .1s;
+    }
+
+    .btn-sm:hover { background: var(--surface2); color: var(--text); }
+
+    .btn-del { color: #A32D2D; border-color: rgba(163,45,45,0.25); }
+    .btn-del:hover { background: #FCEBEB; color: #791F1F; border-color: rgba(163,45,45,0.4); }
+
+    @media (prefers-color-scheme: dark) {
+      .btn-del { color: #F09595; border-color: rgba(240,149,149,0.2); }
+      .btn-del:hover { background: rgba(163,45,45,0.3); color: #F7C1C1; }
+    }
+
+    .empty-hint {
+      font-size: 12px;
+      color: var(--hint);
+      text-align: center;
+      padding: 24px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>To-do list</h1>
+
+  <div class="top">
+    <input id="inp" type="text" placeholder="Nueva tarea..." maxlength="200" autofocus>
+    <button onclick="addTask()">+ Agregar</button>
+  </div>
+
+  <div class="board">
+    <div class="col" id="col-todo" ondragover="onDragOver(event,'todo')" ondrop="onDrop(event,'todo')">
+      <div class="col-head">
+        <span class="col-title">Por hacer</span>
+        <span class="badge badge-todo" id="cnt-todo">0</span>
+      </div>
+      <div id="list-todo"></div>
+    </div>
+
+    <div class="col" id="col-prog" ondragover="onDragOver(event,'prog')" ondrop="onDrop(event,'prog')">
+      <div class="col-head">
+        <span class="col-title">En progreso</span>
+        <span class="badge badge-prog" id="cnt-prog">0</span>
+      </div>
+      <div id="list-prog"></div>
+    </div>
+
+    <div class="col" id="col-done" ondragover="onDragOver(event,'done')" ondrop="onDrop(event,'done')">
+      <div class="col-head">
+        <span class="col-title">Hecho</span>
+        <span class="badge badge-done" id="cnt-done">0</span>
+      </div>
+      <div id="list-done"></div>
+    </div>
+  </div>
+
+  <script>
+    const COLS   = ['todo', 'prog', 'done'];
+    const LABELS = { todo: 'Por hacer', prog: 'En progreso', done: 'Hecho' };
+    let tasks    = [];
+    let dragging = null;
+
+    function load() {
+      try { tasks = JSON.parse(localStorage.getItem('todolist_tasks') || '[]'); } catch(e) { tasks = []; }
+      render();
+    }
+
+    function save() {
+      localStorage.setItem('todolist_tasks', JSON.stringify(tasks));
+    }
+
+    function addTask() {
+      const inp  = document.getElementById('inp');
+      const text = inp.value.trim();
+      if (!text) return;
+      tasks.push({ id: Date.now(), text, status: 'todo' });
+      save();
+      render();
+      inp.value = '';
+      inp.focus();
+    }
+
+    function moveTask(id, status) {
+      const t = tasks.find(t => t.id === id);
+      if (t) { t.status = status; save(); render(); }
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      save();
+      render();
+    }
+
+    function esc(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function render() {
+      COLS.forEach(col => {
+        const list  = document.getElementById('list-' + col);
+        const items = tasks.filter(t => t.status === col);
+        document.getElementById('cnt-' + col).textContent = items.length;
+
+        if (items.length === 0) {
+          list.innerHTML = '<div class="empty-hint">Sin tareas</div>';
+          return;
+        }
+
+        list.innerHTML = items.map(t => {
+          const others = COLS.filter(c => c !== col);
+          const btns   = others.map(c =>
+            `<button class="btn-sm" onclick="moveTask(${t.id},'${c}')">${LABELS[c]}</button>`
+          ).join('');
+          return `
+            <div class="card"
+              draggable="true"
+              id="card-${t.id}"
+              ondragstart="onDragStart(event,${t.id})"
+              ondragend="onDragEnd()">
+              <div class="card-text">${esc(t.text)}</div>
+              <div class="card-actions">
+                ${btns}
+                <button class="btn-sm btn-del" onclick="deleteTask(${t.id})">Eliminar</button>
+              </div>
+            </div>`;
+        }).join('');
+      });
+    }
+
+    function onDragStart(e, id) {
+      dragging = id;
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function onDragEnd() { dragging = null; }
+
+    function onDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    }
+
+    function onDrop(e, col) {
+      e.preventDefault();
+      if (dragging !== null) moveTask(dragging, col);
+    }
+
+    document.getElementById('inp').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addTask();
+    });
+
+    load();
+  </script>
+</body>
+</html>
