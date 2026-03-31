@@ -3,178 +3,262 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>To-do list</title>
+  <title>Tareas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Google+Sans+Text:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #f9f8f6;
-      --surface:   #ffffff;
-      --surface2:  #f1f0ed;
-      --border:    rgba(0,0,0,0.10);
-      --border-md: rgba(0,0,0,0.18);
-      --text:      #1a1a18;
-      --muted:     #6b6a65;
-      --hint:      #a8a79f;
-      --radius-md: 8px;
+      --blue:      #1a73e8;
+      --blue-lt:   #e8f0fe;
+      --red-lt:    #fce8e6;
+      --red:       #c5221f;
+      --orange-lt: #fef3e2;
+      --orange:    #b06000;
+      --green-lt:  #e6f4ea;
+      --green:     #137333;
+      --gray-lt:   #f8f9fa;
+      --gray:      #5f6368;
+      --gray-md:   #80868b;
+      --gray-dk:   #202124;
+      --border:    #dadce0;
+      --white:     #ffffff;
+      --radius:    8px;
       --radius-lg: 12px;
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg:        #1c1c1a;
-        --surface:   #252523;
-        --surface2:  #2e2e2b;
-        --border:    rgba(255,255,255,0.10);
-        --border-md: rgba(255,255,255,0.18);
-        --text:      #e8e6df;
-        --muted:     #9b9a93;
-        --hint:      #6b6a65;
-      }
-    }
-
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'Google Sans', 'Google Sans Text', Roboto, Arial, sans-serif;
+      background: #f8f9fa;
+      color: var(--gray-dk);
       min-height: 100vh;
-      padding: 2rem 1rem 4rem;
     }
 
-    h1 {
-      font-size: 20px;
-      font-weight: 500;
-      margin-bottom: 1.5rem;
-    }
-
-    .top {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 2rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .top input[type="text"] {
-      flex: 1;
-      min-width: 160px;
-      height: 38px;
-      padding: 0 14px;
-      border: 0.5px solid var(--border-md);
-      border-radius: var(--radius-md);
-      background: var(--surface);
-      color: var(--text);
-      font-size: 14px;
-      outline: none;
-      transition: border-color .15s;
-    }
-    .top input[type="text"]:focus { border-color: #888; }
-    .top input[type="text"]::placeholder { color: var(--hint); }
-
-    .priority-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--surface);
-      border: 0.5px solid var(--border-md);
-      border-radius: var(--radius-md);
-      padding: 0 12px;
-      height: 38px;
-    }
-
-    .priority-wrap label {
-      font-size: 12px;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .priority-wrap input[type="range"] {
-      width: 90px;
-      accent-color: #378ADD;
-      cursor: pointer;
-    }
-
-    .priority-val {
-      font-size: 13px;
-      font-weight: 500;
-      min-width: 14px;
-      text-align: right;
-    }
-
-    .top button {
-      height: 38px;
-      padding: 0 18px;
-      border: 0.5px solid var(--border-md);
-      border-radius: var(--radius-md);
-      background: var(--surface);
-      color: var(--text);
-      font-size: 14px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background .12s;
-    }
-    .top button:hover { background: var(--surface2); }
-    .top button:active { transform: scale(0.98); }
-
-    .board {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    @media (max-width: 600px) {
-      .board { grid-template-columns: 1fr; }
-    }
-
-    .col {
-      background: var(--surface2);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 12px;
-      min-height: 320px;
-    }
-
-    .col-head {
+    /* ── HEADER ── */
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 64px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--gray-dk);
+      letter-spacing: -0.3px;
+    }
+
+    .logo span { color: var(--blue); }
+
+    .stats {
+      display: flex;
+      gap: 20px;
+    }
+
+    .stat {
+      font-size: 13px;
+      color: var(--gray-md);
+    }
+
+    .stat strong {
+      font-weight: 500;
+      color: var(--gray-dk);
+    }
+
+    /* ── INPUT AREA ── */
+    .input-area {
+      max-width: 720px;
+      margin: 40px auto 32px;
+      padding: 0 24px;
+    }
+
+    .input-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 1px 3px rgba(60,64,67,.08);
+      transition: box-shadow .2s;
+    }
+
+    .input-card:focus-within {
+      box-shadow: 0 1px 3px rgba(60,64,67,.12), 0 4px 12px rgba(60,64,67,.1);
+      border-color: var(--blue);
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .input-card input[type="text"] {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--gray-dk);
+      background: transparent;
+    }
+
+    .input-card input[type="text"]::placeholder {
+      color: var(--gray-md);
+      font-weight: 400;
+    }
+
+    .input-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .priority-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .priority-row label {
+      font-size: 12px;
+      color: var(--gray-md);
+      white-space: nowrap;
+    }
+
+    .priority-row input[type="range"] {
+      flex: 1;
+      max-width: 140px;
+      height: 4px;
+      accent-color: var(--blue);
+      cursor: pointer;
+    }
+
+    .p-num {
+      font-size: 12px;
+      font-weight: 500;
+      width: 32px;
+      height: 22px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s, color .15s;
+    }
+
+    .add-btn {
+      height: 36px;
+      padding: 0 20px;
+      border: none;
+      border-radius: 20px;
+      background: var(--blue);
+      color: white;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .15s, box-shadow .15s;
+      white-space: nowrap;
+    }
+
+    .add-btn:hover {
+      background: #1557b0;
+      box-shadow: 0 1px 4px rgba(26,115,232,.4);
+    }
+
+    .add-btn:active { transform: scale(.98); }
+
+    /* ── BOARD ── */
+    .board {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (max-width: 700px) {
+      .board { grid-template-columns: 1fr; }
+      .input-area { margin-top: 24px; }
+    }
+
+    /* ── COLUMN ── */
+    .col {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(60,64,67,.06);
+    }
+
+    .col-head {
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .col-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
 
     .col-title {
       font-size: 13px;
       font-weight: 500;
-      color: var(--muted);
+      color: var(--gray);
+      flex: 1;
+      letter-spacing: .1px;
+      text-transform: uppercase;
     }
 
-    .badge {
-      font-size: 11px;
+    .col-count {
+      font-size: 12px;
       font-weight: 500;
-      padding: 2px 8px;
-      border-radius: 20px;
+      color: var(--gray-md);
+      min-width: 18px;
+      text-align: right;
     }
 
-    .badge-todo { background: #E6F1FB; color: #0C447C; }
-    .badge-prog { background: #FAEEDA; color: #633806; }
-    .badge-done { background: #EAF3DE; color: #27500A; }
-
-    @media (prefers-color-scheme: dark) {
-      .badge-todo { background: #0C447C; color: #B5D4F4; }
-      .badge-prog { background: #633806; color: #FAC775; }
-      .badge-done { background: #27500A; color: #C0DD97; }
+    .col-body {
+      padding: 10px 10px 10px;
+      min-height: 240px;
     }
 
+    /* ── CARD ── */
     .card {
-      background: var(--surface);
-      border: 0.5px solid var(--border);
-      border-left: 3px solid var(--p-color);
-      border-radius: var(--radius-md);
-      padding: 10px 12px;
-      margin-bottom: 8px;
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      margin-bottom: 6px;
       cursor: grab;
       user-select: none;
-      transition: opacity .15s;
+      border: 1px solid transparent;
+      transition: border-color .12s, box-shadow .12s, opacity .15s;
+      background: var(--white);
+      position: relative;
     }
+
+    .card:hover {
+      border-color: var(--border);
+      box-shadow: 0 1px 4px rgba(60,64,67,.1);
+    }
+
     .card:active { cursor: grabbing; opacity: .7; }
 
     .card-top {
@@ -182,18 +266,18 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 8px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .card-text {
       font-size: 14px;
-      color: var(--text);
-      line-height: 1.45;
+      color: var(--gray-dk);
+      line-height: 1.5;
       flex: 1;
       word-break: break-word;
     }
 
-    .p-pill {
+    .p-badge {
       font-size: 10px;
       font-weight: 600;
       padding: 2px 7px;
@@ -201,181 +285,229 @@
       white-space: nowrap;
       flex-shrink: 0;
       margin-top: 1px;
+      letter-spacing: .2px;
     }
 
     .card-actions {
       display: flex;
+      gap: 4px;
       flex-wrap: wrap;
-      gap: 5px;
+      opacity: 0;
+      transition: opacity .15s;
     }
 
-    .btn-sm {
+    .card:hover .card-actions { opacity: 1; }
+
+    .btn-action {
+      font-family: inherit;
       font-size: 11px;
-      padding: 3px 9px;
-      border: 0.5px solid var(--border-md);
-      border-radius: var(--radius-md);
-      background: transparent;
-      color: var(--muted);
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--gray);
       cursor: pointer;
-      transition: background .1s, color .1s;
-    }
-    .btn-sm:hover { background: var(--surface2); color: var(--text); }
-
-    .btn-del { color: #A32D2D; border-color: rgba(163,45,45,0.25); }
-    .btn-del:hover { background: #FCEBEB; color: #791F1F; border-color: rgba(163,45,45,0.4); }
-
-    @media (prefers-color-scheme: dark) {
-      .btn-del { color: #F09595; border-color: rgba(240,149,149,0.2); }
-      .btn-del:hover { background: rgba(163,45,45,0.3); color: #F7C1C1; }
+      transition: background .1s, border-color .1s, color .1s;
     }
 
-    .empty-hint {
-      font-size: 12px;
-      color: var(--hint);
+    .btn-action:hover { background: var(--gray-lt); border-color: #bdc1c6; color: var(--gray-dk); }
+
+    .btn-del {
+      color: var(--red);
+      border-color: transparent;
+    }
+
+    .btn-del:hover { background: var(--red-lt); border-color: #f5c6c5; color: var(--red); }
+
+    .empty {
+      padding: 32px 16px;
       text-align: center;
-      padding: 24px 0;
+      color: var(--gray-md);
+      font-size: 13px;
+      line-height: 1.6;
     }
+
+    .empty-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--gray-lt);
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .empty-icon svg { width: 16px; height: 16px; fill: #bdc1c6; }
   </style>
 </head>
 <body>
 
-  <h1>To-do list</h1>
-
-  <div class="top">
-    <input id="inp" type="text" placeholder="Nueva tarea..." maxlength="200" autofocus>
-    <div class="priority-wrap">
-      <label for="pri-slider">Prioridad</label>
-      <input id="pri-slider" type="range" min="1" max="10" step="1" value="5"
-        oninput="document.getElementById('pri-val').textContent=this.value">
-      <span id="pri-val" class="priority-val">5</span>
-    </div>
-    <button onclick="addTask()">+ Agregar</button>
+<header>
+  <div class="logo">Tareas<span>.</span></div>
+  <div class="stats">
+    <span class="stat"><strong id="s-todo">0</strong> pendientes</span>
+    <span class="stat"><strong id="s-prog">0</strong> en progreso</span>
+    <span class="stat"><strong id="s-done">0</strong> completadas</span>
   </div>
+</header>
 
-  <div class="board">
-    <div class="col" ondragover="onDragOver(event)" ondrop="onDrop(event,'todo')">
-      <div class="col-head">
-        <span class="col-title">Por hacer</span>
-        <span class="badge badge-todo" id="cnt-todo">0</span>
-      </div>
-      <div id="list-todo"></div>
+<div class="input-area">
+  <div class="input-card">
+    <div class="input-row">
+      <input id="inp" type="text" placeholder="Añadir una tarea..." maxlength="200" autofocus>
     </div>
-    <div class="col" ondragover="onDragOver(event)" ondrop="onDrop(event,'prog')">
-      <div class="col-head">
-        <span class="col-title">En progreso</span>
-        <span class="badge badge-prog" id="cnt-prog">0</span>
+    <div class="input-footer">
+      <div class="priority-row">
+        <label for="pri">Prioridad</label>
+        <input id="pri" type="range" min="1" max="10" step="1" value="5"
+          oninput="updatePill(this.value)">
+        <span id="p-num" class="p-num">5</span>
       </div>
-      <div id="list-prog"></div>
-    </div>
-    <div class="col" ondragover="onDragOver(event)" ondrop="onDrop(event,'done')">
-      <div class="col-head">
-        <span class="col-title">Hecho</span>
-        <span class="badge badge-done" id="cnt-done">0</span>
-      </div>
-      <div id="list-done"></div>
+      <button class="add-btn" onclick="addTask()">Agregar</button>
     </div>
   </div>
+</div>
 
-  <script>
-    const COLS   = ['todo', 'prog', 'done'];
-    const LABELS = { todo: 'Por hacer', prog: 'En progreso', done: 'Hecho' };
-    let tasks    = [];
-    let dragging = null;
+<div class="board">
+  <div class="col" ondragover="onDragOver(event)" ondrop="onDrop(event,'todo')">
+    <div class="col-head">
+      <div class="col-dot" style="background:#dadce0"></div>
+      <span class="col-title">Por hacer</span>
+      <span class="col-count" id="cnt-todo">0</span>
+    </div>
+    <div class="col-body" id="list-todo"></div>
+  </div>
 
-    function load() {
-      try { tasks = JSON.parse(localStorage.getItem('todolist_tasks') || '[]'); } catch(e) { tasks = []; }
-      render();
-    }
+  <div class="col" ondragover="onDragOver(event)" ondrop="onDrop(event,'prog')">
+    <div class="col-head">
+      <div class="col-dot" style="background:#fbbc04"></div>
+      <span class="col-title">En progreso</span>
+      <span class="col-count" id="cnt-prog">0</span>
+    </div>
+    <div class="col-body" id="list-prog"></div>
+  </div>
 
-    function save() {
-      localStorage.setItem('todolist_tasks', JSON.stringify(tasks));
-    }
+  <div class="col" ondragover="onDragOver(event)" ondrop="onDrop(event,'done')">
+    <div class="col-head">
+      <div class="col-dot" style="background:#34a853"></div>
+      <span class="col-title">Completado</span>
+      <span class="col-count" id="cnt-done">0</span>
+    </div>
+    <div class="col-body" id="list-done"></div>
+  </div>
+</div>
 
-    function addTask() {
-      const inp = document.getElementById('inp');
-      const text = inp.value.trim();
-      if (!text) return;
-      const priority = parseInt(document.getElementById('pri-slider').value, 10);
-      tasks.push({ id: Date.now(), text, status: 'todo', priority });
-      save(); render();
-      inp.value = '';
-      inp.focus();
-    }
+<script>
+  const COLS   = ['todo','prog','done'];
+  const LABELS = { todo:'Por hacer', prog:'En progreso', done:'Completado' };
+  let tasks    = [];
+  let dragging = null;
 
-    function moveTask(id, status) {
-      const t = tasks.find(t => t.id === id);
-      if (t) { t.status = status; save(); render(); }
-    }
+  function load() {
+    try { tasks = JSON.parse(localStorage.getItem('todolist_tasks') || '[]'); } catch(e) { tasks = []; }
+    render();
+  }
 
-    function deleteTask(id) {
-      tasks = tasks.filter(t => t.id !== id);
-      save(); render();
-    }
+  function save() { localStorage.setItem('todolist_tasks', JSON.stringify(tasks)); }
 
-    function sorted(col) {
-      const items = tasks.filter(t => t.status === col);
-      if (col === 'done') return items;
-      return items.slice().sort((a, b) => (b.priority || 5) - (a.priority || 5));
-    }
+  function pColor(p) {
+    if (p >= 9) return { bg:'#fce8e6', text:'#c5221f', dot:'#e8453c' };
+    if (p >= 7) return { bg:'#fef3e2', text:'#b06000', dot:'#fbbc04' };
+    if (p >= 4) return { bg:'#e8f0fe', text:'#1a73e8', dot:'#1a73e8' };
+    return             { bg:'#f1f3f4', text:'#5f6368', dot:'#dadce0' };
+  }
 
-    function priorityColor(p) {
-      if (p >= 9) return { bar: '#E24B4A', pill: '#FCEBEB', text: '#791F1F' };
-      if (p >= 7) return { bar: '#EF9F27', pill: '#FAEEDA', text: '#633806' };
-      if (p >= 4) return { bar: '#378ADD', pill: '#E6F1FB', text: '#0C447C' };
-      return       { bar: '#888780', pill: '#F1EFE8', text: '#5F5E5A' };
-    }
+  function updatePill(v) {
+    const el = document.getElementById('p-num');
+    const c  = pColor(parseInt(v));
+    el.textContent = v;
+    el.style.background = c.bg;
+    el.style.color = c.text;
+  }
 
-    function esc(s) {
-      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
+  function addTask() {
+    const inp = document.getElementById('inp');
+    const text = inp.value.trim();
+    if (!text) return;
+    const p = parseInt(document.getElementById('pri').value, 10);
+    tasks.push({ id: Date.now(), text, status:'todo', priority: p });
+    save(); render();
+    inp.value = '';
+    inp.focus();
+  }
 
-    function render() {
-      COLS.forEach(col => {
-        const list  = document.getElementById('list-' + col);
-        const items = sorted(col);
-        document.getElementById('cnt-' + col).textContent = items.length;
+  function moveTask(id, status) {
+    const t = tasks.find(t => t.id === id);
+    if (t) { t.status = status; save(); render(); }
+  }
 
-        if (items.length === 0) {
-          list.innerHTML = '<div class="empty-hint">Sin tareas</div>';
-          return;
-        }
+  function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    save(); render();
+  }
 
-        list.innerHTML = items.map(t => {
-          const p      = t.priority || 5;
-          const colors = priorityColor(p);
-          const others = COLS.filter(c => c !== col);
-          const btns   = others.map(c =>
-            `<button class="btn-sm" onclick="moveTask(${t.id},'${c}')">${LABELS[c]}</button>`
-          ).join('');
+  function sorted(col) {
+    const items = tasks.filter(t => t.status === col);
+    if (col === 'done') return items;
+    return items.slice().sort((a,b) => (b.priority||5) - (a.priority||5));
+  }
 
-          return `
-            <div class="card" draggable="true" id="card-${t.id}"
-              style="--p-color:${colors.bar}"
-              ondragstart="onDragStart(event,${t.id})"
-              ondragend="onDragEnd()">
-              <div class="card-top">
-                <span class="card-text">${esc(t.text)}</span>
-                <span class="p-pill" style="background:${colors.pill};color:${colors.text}">P${p}</span>
-              </div>
-              <div class="card-actions">
-                ${btns}
-                <button class="btn-sm btn-del" onclick="deleteTask(${t.id})">Eliminar</button>
-              </div>
-            </div>`;
-        }).join('');
-      });
-    }
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
 
-    function onDragStart(e, id) { dragging = id; e.dataTransfer.effectAllowed = 'move'; }
-    function onDragEnd() { dragging = null; }
-    function onDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
-    function onDrop(e, col) { e.preventDefault(); if (dragging !== null) moveTask(dragging, col); }
+  function emptyHTML() {
+    return `<div class="empty">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-7 14l-5-5 1.4-1.4L12 14.2l7.6-7.6L21 8l-9 9z"/></svg>
+      </div>
+      Sin tareas
+    </div>`;
+  }
 
-    document.getElementById('inp').addEventListener('keydown', e => {
-      if (e.key === 'Enter') addTask();
+  function render() {
+    COLS.forEach(col => {
+      const items = sorted(col);
+      document.getElementById('cnt-' + col).textContent = items.length;
+      document.getElementById('s-' + col).textContent   = items.length;
+
+      const list = document.getElementById('list-' + col);
+      if (!items.length) { list.innerHTML = emptyHTML(); return; }
+
+      list.innerHTML = items.map(t => {
+        const p  = t.priority || 5;
+        const c  = pColor(p);
+        const mv = COLS.filter(x => x !== col)
+          .map(x => `<button class="btn-action" onclick="moveTask(${t.id},'${x}')">${LABELS[x]}</button>`)
+          .join('');
+        return `
+          <div class="card" draggable="true" id="card-${t.id}"
+            ondragstart="onDragStart(event,${t.id})"
+            ondragend="onDragEnd()">
+            <div class="card-top">
+              <span class="card-text">${esc(t.text)}</span>
+              <span class="p-badge" style="background:${c.bg};color:${c.text}">P${p}</span>
+            </div>
+            <div class="card-actions">
+              ${mv}
+              <button class="btn-action btn-del" onclick="deleteTask(${t.id})">Eliminar</button>
+            </div>
+          </div>`;
+      }).join('');
     });
+  }
 
-    load();
-  </script>
+  function onDragStart(e,id) { dragging = id; e.dataTransfer.effectAllowed = 'move'; }
+  function onDragEnd()       { dragging = null; }
+  function onDragOver(e)     { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+  function onDrop(e,col)     { e.preventDefault(); if (dragging !== null) moveTask(dragging, col); }
+
+  document.getElementById('inp').addEventListener('keydown', e => { if (e.key === 'Enter') addTask(); });
+
+  updatePill(5);
+  load();
+</script>
 </body>
 </html>
