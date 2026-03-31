@@ -45,18 +45,19 @@
       font-size: 20px;
       font-weight: 500;
       margin-bottom: 1.5rem;
-      color: var(--text);
     }
 
     .top {
       display: flex;
       gap: 8px;
       margin-bottom: 2rem;
-      max-width: 600px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
-    .top input {
+    .top input[type="text"] {
       flex: 1;
+      min-width: 160px;
       height: 38px;
       padding: 0 14px;
       border: 0.5px solid var(--border-md);
@@ -67,9 +68,38 @@
       outline: none;
       transition: border-color .15s;
     }
+    .top input[type="text"]:focus { border-color: #888; }
+    .top input[type="text"]::placeholder { color: var(--hint); }
 
-    .top input:focus { border-color: #888; }
-    .top input::placeholder { color: var(--hint); }
+    .priority-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 0.5px solid var(--border-md);
+      border-radius: var(--radius-md);
+      padding: 0 12px;
+      height: 38px;
+    }
+
+    .priority-wrap label {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .priority-wrap input[type="range"] {
+      width: 90px;
+      accent-color: #378ADD;
+      cursor: pointer;
+    }
+
+    .priority-val {
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 14px;
+      text-align: right;
+    }
 
     .top button {
       height: 38px;
@@ -83,7 +113,6 @@
       white-space: nowrap;
       transition: background .12s;
     }
-
     .top button:hover { background: var(--surface2); }
     .top button:active { transform: scale(0.98); }
 
@@ -138,23 +167,40 @@
     .card {
       background: var(--surface);
       border: 0.5px solid var(--border);
+      border-left: 3px solid var(--p-color);
       border-radius: var(--radius-md);
       padding: 10px 12px;
       margin-bottom: 8px;
       cursor: grab;
       user-select: none;
-      transition: opacity .15s, border-color .1s;
+      transition: opacity .15s;
     }
-
     .card:active { cursor: grabbing; opacity: .7; }
-    .card.drag-over { border-color: var(--border-md); }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
 
     .card-text {
       font-size: 14px;
       color: var(--text);
       line-height: 1.45;
-      margin-bottom: 8px;
+      flex: 1;
       word-break: break-word;
+    }
+
+    .p-pill {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 1px;
     }
 
     .card-actions {
@@ -173,7 +219,6 @@
       cursor: pointer;
       transition: background .1s, color .1s;
     }
-
     .btn-sm:hover { background: var(--surface2); color: var(--text); }
 
     .btn-del { color: #A32D2D; border-color: rgba(163,45,45,0.25); }
@@ -198,27 +243,31 @@
 
   <div class="top">
     <input id="inp" type="text" placeholder="Nueva tarea..." maxlength="200" autofocus>
+    <div class="priority-wrap">
+      <label for="pri-slider">Prioridad</label>
+      <input id="pri-slider" type="range" min="1" max="10" step="1" value="5"
+        oninput="document.getElementById('pri-val').textContent=this.value">
+      <span id="pri-val" class="priority-val">5</span>
+    </div>
     <button onclick="addTask()">+ Agregar</button>
   </div>
 
   <div class="board">
-    <div class="col" id="col-todo" ondragover="onDragOver(event,'todo')" ondrop="onDrop(event,'todo')">
+    <div class="col" ondragover="onDragOver(event)" ondrop="onDrop(event,'todo')">
       <div class="col-head">
         <span class="col-title">Por hacer</span>
         <span class="badge badge-todo" id="cnt-todo">0</span>
       </div>
       <div id="list-todo"></div>
     </div>
-
-    <div class="col" id="col-prog" ondragover="onDragOver(event,'prog')" ondrop="onDrop(event,'prog')">
+    <div class="col" ondragover="onDragOver(event)" ondrop="onDrop(event,'prog')">
       <div class="col-head">
         <span class="col-title">En progreso</span>
         <span class="badge badge-prog" id="cnt-prog">0</span>
       </div>
       <div id="list-prog"></div>
     </div>
-
-    <div class="col" id="col-done" ondragover="onDragOver(event,'done')" ondrop="onDrop(event,'done')">
+    <div class="col" ondragover="onDragOver(event)" ondrop="onDrop(event,'done')">
       <div class="col-head">
         <span class="col-title">Hecho</span>
         <span class="badge badge-done" id="cnt-done">0</span>
@@ -243,12 +292,12 @@
     }
 
     function addTask() {
-      const inp  = document.getElementById('inp');
+      const inp = document.getElementById('inp');
       const text = inp.value.trim();
       if (!text) return;
-      tasks.push({ id: Date.now(), text, status: 'todo' });
-      save();
-      render();
+      const priority = parseInt(document.getElementById('pri-slider').value, 10);
+      tasks.push({ id: Date.now(), text, status: 'todo', priority });
+      save(); render();
       inp.value = '';
       inp.focus();
     }
@@ -260,8 +309,20 @@
 
     function deleteTask(id) {
       tasks = tasks.filter(t => t.id !== id);
-      save();
-      render();
+      save(); render();
+    }
+
+    function sorted(col) {
+      const items = tasks.filter(t => t.status === col);
+      if (col === 'done') return items;
+      return items.slice().sort((a, b) => (b.priority || 5) - (a.priority || 5));
+    }
+
+    function priorityColor(p) {
+      if (p >= 9) return { bar: '#E24B4A', pill: '#FCEBEB', text: '#791F1F' };
+      if (p >= 7) return { bar: '#EF9F27', pill: '#FAEEDA', text: '#633806' };
+      if (p >= 4) return { bar: '#378ADD', pill: '#E6F1FB', text: '#0C447C' };
+      return       { bar: '#888780', pill: '#F1EFE8', text: '#5F5E5A' };
     }
 
     function esc(s) {
@@ -271,7 +332,7 @@
     function render() {
       COLS.forEach(col => {
         const list  = document.getElementById('list-' + col);
-        const items = tasks.filter(t => t.status === col);
+        const items = sorted(col);
         document.getElementById('cnt-' + col).textContent = items.length;
 
         if (items.length === 0) {
@@ -280,17 +341,22 @@
         }
 
         list.innerHTML = items.map(t => {
+          const p      = t.priority || 5;
+          const colors = priorityColor(p);
           const others = COLS.filter(c => c !== col);
           const btns   = others.map(c =>
             `<button class="btn-sm" onclick="moveTask(${t.id},'${c}')">${LABELS[c]}</button>`
           ).join('');
+
           return `
-            <div class="card"
-              draggable="true"
-              id="card-${t.id}"
+            <div class="card" draggable="true" id="card-${t.id}"
+              style="--p-color:${colors.bar}"
               ondragstart="onDragStart(event,${t.id})"
               ondragend="onDragEnd()">
-              <div class="card-text">${esc(t.text)}</div>
+              <div class="card-top">
+                <span class="card-text">${esc(t.text)}</span>
+                <span class="p-pill" style="background:${colors.pill};color:${colors.text}">P${p}</span>
+              </div>
               <div class="card-actions">
                 ${btns}
                 <button class="btn-sm btn-del" onclick="deleteTask(${t.id})">Eliminar</button>
@@ -300,22 +366,10 @@
       });
     }
 
-    function onDragStart(e, id) {
-      dragging = id;
-      e.dataTransfer.effectAllowed = 'move';
-    }
-
+    function onDragStart(e, id) { dragging = id; e.dataTransfer.effectAllowed = 'move'; }
     function onDragEnd() { dragging = null; }
-
-    function onDragOver(e) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-    }
-
-    function onDrop(e, col) {
-      e.preventDefault();
-      if (dragging !== null) moveTask(dragging, col);
-    }
+    function onDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+    function onDrop(e, col) { e.preventDefault(); if (dragging !== null) moveTask(dragging, col); }
 
     document.getElementById('inp').addEventListener('keydown', e => {
       if (e.key === 'Enter') addTask();
